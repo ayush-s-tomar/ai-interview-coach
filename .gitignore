@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Reports
+reports/*.pdf
+
+# Models (downloaded at runtime)
+*.bin
+*.pt
+
+# OS
+.DS_Store
+Thumbs.db
