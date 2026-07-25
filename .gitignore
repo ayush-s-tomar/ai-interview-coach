@@ -20,3 +20,5 @@ reports/*.pdf
 # OS
 .DS_Store
 Thumbs.db
+
+streamlit_app/.streamlit/secrets.toml
