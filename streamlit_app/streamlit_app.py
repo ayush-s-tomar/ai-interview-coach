@@ -38,6 +38,112 @@ load_dotenv()
 
 st.set_page_config(page_title="AI Interview Coach", page_icon="🎙️", layout="centered")
 
+
+def inject_css():
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+        --bg: #0B0C10;
+        --surface: #15171D;
+        --surface-alt: #1B1E26;
+        --border: #262A33;
+        --text: #ECEAE6;
+        --muted: #8A8F9C;
+        --coral: #FF5A4E;
+        --coral-dim: #7A2E28;
+        --teal: #35D0BA;
+        --amber: #F5B942;
+    }
+
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    .stApp { background: var(--bg); color: var(--text); }
+
+    h1, h2, h3, .app-title { font-family: 'Space Grotesk', sans-serif !important; letter-spacing: -0.02em; }
+
+    /* Header */
+    .coach-header { display: flex; align-items: center; gap: 16px; margin-bottom: 4px; }
+    .coach-header .mic-badge {
+        width: 52px; height: 52px; border-radius: 14px;
+        background: linear-gradient(135deg, var(--coral), #C93A2F);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 24px; flex-shrink: 0;
+        box-shadow: 0 6px 18px rgba(255,90,78,0.25);
+    }
+    .app-title { font-size: 30px; font-weight: 700; color: var(--text); margin: 0; }
+    .app-subtitle { color: var(--muted); font-size: 14px; margin: 6px 0 0 0; }
+
+    .waveform { display: flex; align-items: flex-end; gap: 3px; height: 22px; margin: 18px 0 22px 0; }
+    .waveform span {
+        display: block; width: 3px; border-radius: 2px;
+        background: linear-gradient(180deg, var(--coral), var(--teal));
+        animation: wave 1.2s ease-in-out infinite;
+        opacity: 0.85;
+    }
+    @keyframes wave { 0%,100% { height: 20%; } 50% { height: 100%; } }
+
+    hr.coach-divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+    /* Cards */
+    .coach-card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 16px; padding: 22px 24px; margin-bottom: 16px;
+    }
+    .q-badge {
+        display: inline-flex; align-items: center; justify-content: center;
+        background: var(--coral-dim); color: var(--coral); font-family: 'JetBrains Mono', monospace;
+        font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+        letter-spacing: 0.04em; margin-bottom: 10px;
+    }
+    .q-text { font-size: 19px; font-weight: 600; line-height: 1.5; color: var(--text); }
+
+    /* Score bars */
+    .score-row { margin: 10px 0; }
+    .score-label {
+        display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace;
+        font-size: 12px; color: var(--muted); margin-bottom: 4px;
+    }
+    .score-track { background: var(--surface-alt); border-radius: 6px; height: 8px; overflow: hidden; }
+    .score-fill { height: 100%; border-radius: 6px; }
+
+    /* Metric cards */
+    .metric-card {
+        background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+        padding: 16px 18px; text-align: center;
+    }
+    .metric-value { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; color: var(--coral); }
+    .metric-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+    .verdict-banner {
+        border-radius: 14px; padding: 16px 20px; font-size: 15px; line-height: 1.5;
+        border-left: 4px solid var(--coral); background: var(--surface); margin: 14px 0;
+    }
+
+    /* Streamlit widget overrides */
+    .stButton > button[kind="primary"] {
+        background: var(--coral); border: none; border-radius: 10px; font-weight: 600;
+    }
+    .stButton > button[kind="primary"]:hover { background: #E64A3F; }
+    .stButton > button[kind="secondary"] { border-radius: 10px; }
+    .stProgress > div > div > div > div { background: var(--coral) !important; }
+    div[data-testid="stExpander"] { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+    </style>
+    """, unsafe_allow_html=True)
+
+
+def render_score_bar(label: str, value: float, color: str = "var(--coral)"):
+    pct = max(0, min(100, value * 10))
+    st.markdown(f"""
+    <div class="score-row">
+        <div class="score-label"><span>{label}</span><span>{value}/10</span></div>
+        <div class="score-track"><div class="score-fill" style="width:{pct}%; background:{color};"></div></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+inject_css()
+
 GROQ_API_KEY = os.getenv("GROQ_API_KEY") or st.secrets.get("GROQ_API_KEY", None)
 WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL", "base")
 
@@ -339,17 +445,32 @@ def reset_session():
 
 init_state()
 
-st.title("🎙️ AI Interview Coach")
-st.caption("Real-time voice interview simulator — scored on relevance, clarity, technical accuracy, and confidence.")
+bar_heights = [40, 70, 100, 55, 85, 45, 90, 60, 75, 50, 95, 65]
+bars_html = "".join(
+    f'<span style="height:{h}%; animation-delay:{i*0.08}s;"></span>' for i, h in enumerate(bar_heights)
+)
+st.markdown(f"""
+<div class="coach-header">
+    <div class="mic-badge">🎙️</div>
+    <div>
+        <p class="app-title">AI Interview Coach</p>
+        <p class="app-subtitle">Real-time voice interview simulator — scored on relevance, clarity, technical accuracy, and confidence.</p>
+    </div>
+</div>
+<div class="waveform">{bars_html}</div>
+<hr class="coach-divider" />
+""", unsafe_allow_html=True)
 
 # ──────────────────────────────────────────────────────────────────────────
 # Stage 1 — role selection
 # ──────────────────────────────────────────────────────────────────────────
 
 if st.session_state.stage == "role_select":
+    st.markdown('<div class="coach-card">', unsafe_allow_html=True)
     st.session_state.candidate_name = st.text_input("Your name", value=st.session_state.candidate_name)
     role = st.selectbox("Choose the role you're interviewing for", list(QUESTION_BANK.keys()))
     num_q = st.slider("Number of questions", 3, 8, 5)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if st.button("Start Interview", type="primary"):
         st.session_state.role = role
@@ -370,7 +491,13 @@ elif st.session_state.stage == "interview":
     question = st.session_state.questions[idx]
 
     st.progress(idx / total, text=f"Question {idx + 1} of {total}")
-    st.subheader(f"Q{idx + 1}. {question}")
+
+    st.markdown(f"""
+    <div class="coach-card">
+        <span class="q-badge">{st.session_state.role.upper()} · Q{idx + 1}/{total}</span>
+        <div class="q-text">{question}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     with st.spinner("Loading question audio..."):
         try:
@@ -399,7 +526,12 @@ elif st.session_state.stage == "interview":
         if not transcript:
             st.error("Could not transcribe audio — please speak clearly and try again.")
         else:
-            st.info(f"**Transcript:** {transcript}")
+            st.markdown(f"""
+            <div class="coach-card" style="border-left: 3px solid var(--teal);">
+                <span class="q-badge" style="background:rgba(53,208,186,0.12); color:var(--teal);">TRANSCRIPT</span>
+                <div style="color:var(--text); line-height:1.6;">{transcript}</div>
+            </div>
+            """, unsafe_allow_html=True)
             with st.spinner("Scoring your answer with AI..."):
                 try:
                     score = score_answer(st.session_state.role, question, transcript)
@@ -431,23 +563,44 @@ elif st.session_state.stage == "interview":
 # ──────────────────────────────────────────────────────────────────────────
 
 elif st.session_state.stage == "summary":
-    st.success("Interview complete!")
-
     scores = st.session_state.scores
     avg = round(sum(s["overall"] for s in scores) / len(scores), 2) if scores else 0
 
+    if avg >= 7.5:
+        verdict, vcolor = "Strong Candidate — solid knowledge across the board. Push for depth in your weaker spots.", "var(--teal)"
+    elif avg >= 5:
+        verdict, vcolor = "Promising — good foundation with room to grow. Revisit the flagged topics before your next interview.", "var(--amber)"
+    else:
+        verdict, vcolor = "Needs Work — revisit the fundamentals and structure answers using the STAR method.", "var(--coral)"
+
+    st.markdown(f"""
+    <div class="verdict-banner" style="border-left-color:{vcolor};">
+        <strong>Interview complete.</strong> {verdict}
+    </div>
+    """, unsafe_allow_html=True)
+
     c1, c2, c3 = st.columns(3)
-    c1.metric("Role", st.session_state.role)
-    c2.metric("Questions Answered", len(scores))
-    c3.metric("Average Score", f"{avg}/10")
+    for col, label, value in [
+        (c1, "Role", st.session_state.role),
+        (c2, "Questions Answered", len(scores)),
+        (c3, "Average Score", f"{avg}/10"),
+    ]:
+        col.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-value">{value}</div>
+            <div class="metric-label">{label}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     for i, (q, a, s) in enumerate(zip(st.session_state.questions, st.session_state.answers, scores), 1):
         with st.expander(f"Q{i}: {q}"):
-            st.write(f"**Your answer:** {a}")
-            st.write(
-                f"Relevance: {s['relevance']}/10 · Clarity: {s['clarity']}/10 · "
-                f"Technical Accuracy: {s['technical_accuracy']}/10 · Confidence: {s['confidence']}/10"
-            )
+            st.markdown(f"**Your answer:** {a}")
+            render_score_bar("Relevance", s['relevance'], "var(--coral)")
+            render_score_bar("Clarity", s['clarity'], "var(--teal)")
+            render_score_bar("Technical Accuracy", s['technical_accuracy'], "var(--amber)")
+            render_score_bar("Confidence", s['confidence'], "var(--coral)")
             st.write(f"**Feedback:** {s.get('feedback', '')}")
             tips = s.get("improvement_tips", [])
             if tips:
