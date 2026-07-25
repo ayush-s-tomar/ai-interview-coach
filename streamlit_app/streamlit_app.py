@@ -128,6 +128,20 @@ def inject_css():
     .stButton > button[kind="secondary"] { border-radius: 10px; }
     .stProgress > div > div > div > div { background: var(--coral) !important; }
     div[data-testid="stExpander"] { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+
+    /* Native bordered container -> dark card */
+    div[data-testid="stVerticalBlockBorderWrapper"] > div {
+        background: var(--surface); border: 1px solid var(--border) !important;
+        border-radius: 16px !important;
+    }
+
+    /* Trim default top padding so the header sits higher */
+    .block-container { padding-top: 2.2rem; }
+
+    .coach-footer {
+        text-align: center; color: var(--muted); font-size: 12px;
+        margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border);
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -466,11 +480,15 @@ st.markdown(f"""
 # ──────────────────────────────────────────────────────────────────────────
 
 if st.session_state.stage == "role_select":
-    st.markdown('<div class="coach-card">', unsafe_allow_html=True)
-    st.session_state.candidate_name = st.text_input("Your name", value=st.session_state.candidate_name)
-    role = st.selectbox("Choose the role you're interviewing for", list(QUESTION_BANK.keys()))
-    num_q = st.slider("Number of questions", 3, 8, 5)
-    st.markdown('</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        name_input = st.text_input(
+            "Your name",
+            value="" if st.session_state.candidate_name == "Candidate" else st.session_state.candidate_name,
+            placeholder="Candidate",
+        )
+        st.session_state.candidate_name = name_input.strip() if name_input.strip() else "Candidate"
+        role = st.selectbox("Choose the role you're interviewing for", list(QUESTION_BANK.keys()))
+        num_q = st.slider("Number of questions", 3, 8, 5)
 
     if st.button("Start Interview", type="primary"):
         st.session_state.role = role
@@ -628,3 +646,5 @@ elif st.session_state.stage == "summary":
     if st.button("Start a New Interview"):
         reset_session()
         st.rerun()
+
+st.markdown('<div class="coach-footer">AI Interview Coach · Practice makes perfect</div>', unsafe_allow_html=True)
