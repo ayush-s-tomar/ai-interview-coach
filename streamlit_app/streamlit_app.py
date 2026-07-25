@@ -8,27 +8,23 @@ Faster-Whisper transcribes -> Groq LLaMA 3.3 scores -> PDF report at the end.
 """
 
 import io
-import os
 import json
+import os
 import random
 import tempfile
 from datetime import datetime
 
 import streamlit as st
 from dotenv import load_dotenv
+from faster_whisper import WhisperModel
 from groq import Groq
 from gtts import gTTS
-from faster_whisper import WhisperModel
-
-from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import mm
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, KeepTogether
-)
 from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.platypus import HRFlowable, KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 load_dotenv()
 
