@@ -264,7 +264,14 @@ def transcribe_audio(audio_bytes: bytes, suffix: str = ".wav") -> str:
         tmp.write(audio_bytes)
         tmp_path = tmp.name
     try:
-        segments, _info = model.transcribe(tmp_path, beam_size=5, language="en")
+        segments, _info = model.transcribe(
+            tmp_path,
+            beam_size=5,
+            language="en",
+            vad_filter=True,
+            vad_parameters=dict(min_silence_duration_ms=500),
+            condition_on_previous_text=False,
+        )
         return " ".join(seg.text.strip() for seg in segments).strip()
     finally:
         os.unlink(tmp_path)
@@ -530,6 +537,16 @@ elif st.session_state.stage == "interview":
 
     answer_audio = mic_audio or uploaded_audio
 
+    if answer_audio is not None:
+        preview_bytes = answer_audio.getvalue()
+        st.caption(f"Captured {len(preview_bytes) / 1024:.1f} KB — play it back to confirm your voice is there:")
+        st.audio(preview_bytes)
+        if len(preview_bytes) < 8000:
+            st.warning(
+                "That recording looks very short or silent. Make sure your mic isn't muted "
+                "and you're speaking for at least 2–3 seconds before re-recording."
+            )
+
     col1, col2 = st.columns([1, 1])
     with col1:
         submit = st.button("Submit Answer", type="primary", disabled=answer_audio is None)
@@ -542,7 +559,11 @@ elif st.session_state.stage == "interview":
             transcript = transcribe_audio(audio_bytes)
 
         if not transcript:
-            st.error("Could not transcribe audio — please speak clearly and try again.")
+            st.error(
+                "Could not detect any speech in that recording. Common causes: mic muted at the "
+                "OS/browser level, recording stopped too fast, or background noise only. "
+                "Try again, or use the file-upload option instead."
+            )
         else:
             st.markdown(f"""
             <div class="coach-card" style="border-left: 3px solid var(--teal);">
