@@ -5,6 +5,7 @@
 ![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3_70B-F55036)
 ![Whisper](https://img.shields.io/badge/Faster--Whisper-Speech--to--Text-412991)
 ![Deployed](https://img.shields.io/badge/Live-Streamlit_Cloud-brightgreen)
+[![CI](https://github.com/ayush-s-tomar/ai-interview-coach/actions/workflows/ci.yml/badge.svg)](https://github.com/ayush-s-tomar/ai-interview-coach/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 > Real-time voice interview simulator that scores answers on relevance, clarity, technical accuracy, and confidence — generates a personalized PDF feedback report.
