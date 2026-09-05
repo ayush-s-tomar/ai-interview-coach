@@ -8,7 +8,7 @@
 [![CI](https://github.com/ayush-s-tomar/ai-interview-coach/actions/workflows/ci.yml/badge.svg)](https://github.com/ayush-s-tomar/ai-interview-coach/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-> Real-time voice interview simulator that scores answers on relevance, clarity, technical accuracy, and confidence — generates a personalized PDF feedback report.
+> Real-time voice interview simulator that scores answers on relevance, clarity, technical accuracy, and confidence — then generates a personalized PDF feedback report.
 
 🔗 **[Live Demo](https://mockinterview-ai.streamlit.app/)**
 
@@ -16,21 +16,38 @@
 
 ---
 
+## 📚 Contents
+
+[Why I Built This](#-why-i-built-this) · [Features](#-features) · [Architecture](#️-architecture) · [Tech Stack](#️-tech-stack) · [How It Works](#-how-it-works) · [Run Locally](#-run-locally) · [Env Vars](#-environment-variables) · [Structure](#-project-structure) · [Roadmap](#️-planned-improvements)
+
+---
+
 ## 💡 Why I Built This
 
-Every fresher faces the same problem — you can study DSA and system design, but nobody tells you how your actual answers sound in a real interview. I built this while preparing for interviews myself. It's the tool I wished existed.
+Every fresher faces the same problem — you can grind DSA and system design, but nobody tells you how your actual spoken answers land in a real interview. I built this while prepping for my own interviews. It's the tool I wished existed: record an answer, get scored like a real interviewer would, and see exactly where you lose points.
 
 ---
 
 ## ✨ Features
 
 - 🎯 **Role-based questions** — SDE, AI Engineer, Data Analyst
-- 🎤 **Voice recording** — answer questions verbally, right in the browser
-- 🤖 **AI scoring** — powered by Groq (LLaMA 3.3 70B) across 4 dimensions:
-  - Relevance · Clarity · Technical Accuracy · Confidence
-- 📄 **PDF report** — detailed per-question breakdown with improvement tips
-- ⚡ **Fast transcription** — Faster-Whisper for accurate speech-to-text, with automatic fallback to a lighter model under memory pressure
-- 🔒 **Privacy first** — no audio stored; transcription happens in-memory
+- 🎤 **Voice recording** — answer verbally, right in the browser (or upload audio)
+- 🤖 **AI scoring** — Groq (LLaMA 3.3 70B) evaluates across 4 dimensions: Relevance · Clarity · Technical Accuracy · Confidence
+- 📄 **PDF report** — per-question breakdown with concrete improvement tips
+- ⚡ **Fast transcription** — Faster-Whisper, with automatic fallback to a lighter model under memory pressure
+- 🔒 **Privacy-first** — no audio stored; transcription happens in-memory
+
+---
+
+## 🏗️ Architecture
+
+Single-file Streamlit app — no separate backend, no database. Audio is captured client-side, transcribed in-memory via Faster-Whisper, scored by a single Groq LLM call, and rendered straight into a downloadable PDF. Nothing about a candidate's answers ever touches disk.
+
+```
+Browser mic → Faster-Whisper (in-memory) → Groq LLaMA 3.3 70B → ReportLab PDF
+```
+
+**Design trade-off:** kept the whole app in one file on purpose — no client/server split — so it deploys free on Streamlit Cloud with zero DevOps and stays easy to fork.
 
 ---
 
@@ -40,7 +57,7 @@ Every fresher faces the same problem — you can study DSA and system design, bu
 |---|---|---|
 | App | Streamlit | Single-file app, zero frontend/backend split, fast to ship |
 | Transcription | Faster-Whisper | 4x faster than OpenAI Whisper, runs on CPU |
-| AI Scoring | Groq API (LLaMA 3.3 70B) | Free, fast inference |
+| AI Scoring | Groq API (LLaMA 3.3 70B) | Free tier, fast inference |
 | Text-to-Speech | gTTS | Lightweight, no API key needed |
 | PDF Generation | ReportLab | Full control over report layout |
 | Deployment | Streamlit Community Cloud | Free tier, zero DevOps |
@@ -106,12 +123,19 @@ ai-interview-coach/
 
 ---
 
-## 🗺️ Roadmap
+## 🗺️ Planned Improvements
 
-- [ ] Add more roles (Product Manager, Data Engineer)
-- [ ] Confidence detection via audio analysis
+- [ ] More roles (Product Manager, Data Engineer)
+- [ ] Confidence detection via audio prosody analysis
 - [ ] Interview history dashboard
 - [ ] Shareable report links
+
+---
+
+## 👤 Author
+
+**Ayush Singh Tomar** — AI/ML Developer
+[GitHub](https://github.com/ayush-s-tomar) · [Dev.to](https://dev.to/ayushsinghtomar)
 
 ---
 
