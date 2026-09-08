@@ -8,17 +8,21 @@
 [![CI](https://github.com/ayush-s-tomar/ai-interview-coach/actions/workflows/ci.yml/badge.svg)](https://github.com/ayush-s-tomar/ai-interview-coach/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-> Real-time voice interview simulator that scores answers on relevance, clarity, technical accuracy, and confidence — then generates a personalized PDF feedback report.
+**Speak your answer. Get scored like a real interviewer would. Walk away with a PDF that says exactly where you lost points.**
+
+A voice-based mock interview simulator that scores answers on relevance, clarity, technical accuracy, and confidence — then generates a personalized feedback report, no audio ever touching disk.
 
 🔗 **[Live Demo](https://mockinterview-ai.streamlit.app/)**
 
-![Demo](ai-interview-demo.png)
+![AI Interview Coach recording screen with role selection](ai-interview-demo.png)
+
+<!-- TODO: screenshot of a generated PDF report (score breakdown page) — shows the actual deliverable, not just the recording screen. Highest-impact addition here. -->
 
 ---
 
 ## 📚 Contents
 
-[Why I Built This](#-why-i-built-this) · [Features](#-features) · [Architecture](#️-architecture) · [Tech Stack](#️-tech-stack) · [How It Works](#-how-it-works) · [Run Locally](#-run-locally) · [Env Vars](#-environment-variables) · [Structure](#-project-structure) · [Roadmap](#️-planned-improvements)
+[Why I Built This](#-why-i-built-this) · [Features](#-features) · [Architecture](#️-architecture) · [Tech Stack](#️-tech-stack) · [How It Works](#-how-it-works) · [Run Locally](#-run-locally) · [Env Vars](#-environment-variables) · [Structure](#-project-structure) · [Roadmap](#️-roadmap)
 
 ---
 
@@ -123,7 +127,7 @@ ai-interview-coach/
 
 ---
 
-## 🗺️ Planned Improvements
+## 🗺️ Roadmap
 
 - [ ] More roles (Product Manager, Data Engineer)
 - [ ] Confidence detection via audio prosody analysis
